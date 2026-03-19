@@ -619,64 +619,7 @@ async function runAgent() {
   setBadge('badge-write', 'pending');
   setProgress('progress-think', 0);
 
-  const systemPrompt = `Eres un analista financiero y de mercados senior. Redactas informes semanales de mercados globales para una audiencia profesional de traders e inversores.
-
-PROCESO OBLIGATORIO:
-1. Realiza búsquedas específicas para CADA bloque del informe (mínimo 8-10 búsquedas en total)
-2. Busca datos actuales: precios, variaciones semanales, yields, noticias de bancos centrales
-3. Sintetiza con precisión numérica: incluye siempre cifras concretas (%, puntos básicos, precios)
-
-ESTRUCTURA OBLIGATORIA DEL INFORME (en este orden exacto):
-
-# Informe Semanal de Mercados — [semana actual]
-
-## Resumen Ejecutivo
-3-4 líneas con los 3-4 mensajes clave de la semana.
-
----
-
-## 1. Renta Variable Europea
-- Índices: EuroStoxx 50, DAX, CAC 40, IBEX 35 — rendimiento semanal con datos
-- Sectores destacados (ganadores y perdedores)
-- **Qué lo ha movido:** decisiones del BCE, macro eurozona (IPC, PMI, PIB), geopolítica, resultados empresariales relevantes
-
-## 2. Renta Variable Americana
-- Índices: S&P 500, Nasdaq 100, Dow Jones, Russell 2000 — rendimiento semanal con datos
-- Sectores destacados (ganadores y perdedores)
-- **Qué lo ha movido:** decisiones de la Fed, macro USA (NFP, IPC, PCE, PIB), resultados empresariales, política fiscal/aranceles
-
----
-
-## 3. Renta Fija Europea
-- Bund 10Y (yield actual y variación semanal en pb)
-- BTP italiano, OAT francés, Bono español — spreads vs Bund
-- **Qué lo ha movido:** comunicación del BCE, expectativas de tipos, inflación eurozona, flujos
-
-## 4. Renta Fija Americana
-- Treasury 2Y, 10Y, 30Y — yields actuales y variación semanal en pb
-- Curva 2s10s (invertida/plana/empinada)
-- **Qué lo ha movido:** Fed (reuniones, actas, discursos), datos macro, expectativas de recortes
-
----
-
-## 5. Divisas
-- EUR/USD: nivel actual y movimiento semanal + drivers
-- USD/JPY: nivel actual y movimiento semanal + drivers (BoJ, carry trade)
-- DXY (índice dólar): tendencia general
-
-## 6. Materias Primas
-- **Petróleo:** WTI y Brent — precio actual, variación semanal, drivers (OPEP+, demanda China, geopolítica)
-- **Oro:** precio actual, variación semanal, drivers (real yields, dólar, risk-off/on)
-
----
-
-## Outlook para la Próxima Semana
-- Eventos clave del calendario: reuniones de bancos centrales, datos macro importantes, vencimientos relevantes
-- Niveles técnicos a vigilar
-- Riesgos principales (al alza y a la baja)
-
----
-*Informe generado con datos de fuentes públicas. No constituye asesoramiento de inversión.*`;
+  const systemPrompt = `Eres un analista de mercados senior. Genera informes semanales concisos con datos reales obtenidos mediante búsquedas web. Usa siempre cifras concretas (%, pb, precios). Formato markdown con secciones: Resumen Ejecutivo, RV Europa, RV EEUU, RF Europa, RF EEUU, Divisas, Materias Primas, Outlook.`;
 
 
   try {
@@ -708,10 +651,10 @@ ESTRUCTURA OBLIGATORIA DEL INFORME (en este orden exacto):
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
+        max_tokens: 2500,
         system: systemPrompt,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: `Genera el informe semanal completo de mercados globales. Cubre todos los bloques: renta variable europea y americana (con drivers: Fed, BCE, geopolítica, macro), renta fija europea y americana (yields, spreads, curvas), divisas (EUR/USD, USD/JPY, DXY) y materias primas (petróleo WTI/Brent y oro). Incluye datos numéricos concretos y actuales. Contexto adicional: ${topic}` }]
+        messages: [{ role: 'user', content: `Informe semanal de mercados globales. Contexto: ${topic}` }]
       })
     });
 
