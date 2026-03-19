@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -851,14 +850,16 @@ async function exportPDF() {
     setFont('normal', 8, [107, 107, 138]);
     doc.text(dateStr.charAt(0).toUpperCase() + dateStr.slice(1), margin, 52);
 
-    // Footer note on cover
-    setFont('italic', 7, [107, 107, 138]);
-    doc.text('Generado con IA · No constituye asesoramiento de inversión', margin, pageH - 10);
-
     y = 72;
 
     // ── Parse markdown to PDF ────────────────────────────────
-    const lines = reportText.split('\n');
+    // Strip any intro preamble before the first # heading
+    let cleanReport = reportText;
+    const firstHeading = cleanReport.indexOf('\n# ');
+    if (firstHeading > 0) cleanReport = cleanReport.slice(firstHeading + 1);
+    else if (cleanReport.startsWith('# ')) cleanReport = cleanReport;
+
+    const lines = cleanReport.split('\n');
 
     const checkPageBreak = (needed = 8) => {
       if (y + needed > pageH - 16) {
@@ -899,7 +900,7 @@ async function exportPDF() {
       if (line.startsWith('### ')) {
         checkPageBreak(8);
         y += 2;
-        setFont('bold', 9.5, [200, 200, 220]);
+        setFont('bold', 9.5, [40, 40, 40]);
         doc.text(line.slice(4), margin, y);
         y += 6;
         continue;
@@ -918,8 +919,8 @@ async function exportPDF() {
       if (line.match(/^[-*] /)) {
         const text = line.slice(2).replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1');
         checkPageBreak(6);
-        setFont('normal', 8.5, [200, 200, 220]);
-        doc.setFillColor(0, 229, 160);
+        setFont('normal', 8.5, [30, 30, 30]);
+        doc.setFillColor(0, 180, 120);
         doc.circle(margin + 1.2, y - 1.2, 0.8, 'F');
         const wrapped = doc.splitTextToSize(text, contentW - 6);
         doc.text(wrapped, margin + 5, y);
@@ -934,7 +935,7 @@ async function exportPDF() {
         doc.rect(margin, y - 4, contentW, 7, 'F');
         doc.setFillColor(77, 124, 255);
         doc.rect(margin, y - 4, 1.5, 7, 'F');
-        setFont('italic', 8, [150, 150, 180]);
+        setFont('italic', 8, [80, 80, 100]);
         doc.text(line.slice(2), margin + 4, y);
         y += 7;
         continue;
@@ -945,7 +946,7 @@ async function exportPDF() {
       if (!clean) { y += 2; continue; }
 
       checkPageBreak(6);
-      setFont('normal', 8.5, [200, 200, 220]);
+      setFont('normal', 8.5, [30, 30, 30]);
       const wrapped = doc.splitTextToSize(clean, contentW);
       doc.text(wrapped, margin, y);
       y += wrapped.length * 5 + 1;
@@ -955,9 +956,8 @@ async function exportPDF() {
     const totalPages = doc.getNumberOfPages();
     for (let p = 2; p <= totalPages; p++) {
       doc.setPage(p);
-      setFont('normal', 7, [107, 107, 138]);
-      doc.text(`Página ${p - 1} de ${totalPages - 1}`, pageW - margin, pageH - 8, { align: 'right' });
-      doc.text('Agente de Informes · No asesoramiento financiero', margin, pageH - 8);
+      setFont('normal', 7, [160, 160, 160]);
+      doc.text(`${p - 1} / ${totalPages - 1}`, pageW - margin, pageH - 8, { align: 'right' });
     }
 
     // Save
